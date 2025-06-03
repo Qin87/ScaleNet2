@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import uuid
+import gc
 
 import torch
 from torch.utils.data import DataLoader
@@ -13,6 +14,17 @@ from src.datasets.data_loading import get_dataset, get_dataset_split
 from src.datasets.dataset import FullBatchGraphDataset
 from src.model import get_model, LightingFullBatchModelWrapper
 from src.utils.arguments import args
+
+# import torch
+import builtins
+
+original_load = torch.load
+
+def custom_load(*args, **kwargs):
+    kwargs['weights_only'] = False
+    return original_load(*args, **kwargs)
+
+torch.load = custom_load
 
 
 def run(args):
@@ -37,8 +49,6 @@ def run(args):
         # Get model
         args.num_features, args.num_classes = data.num_features, dataset.num_classes
         model = get_model(args)
-
-
 
         lit_model = LightingFullBatchModelWrapper(
             model=model,
@@ -86,6 +96,15 @@ def run(args):
         test_acc = trainer.test(ckpt_path="best", dataloaders=data_loader)[0]["test_acc"]
         test_accs.append(test_acc)
         val_accs.append(val_acc)
+
+        del model
+        del lit_model
+        del trainer
+        del early_stopping_callback
+        del model_summary_callback
+        del model_checkpoint_callback
+        torch.cuda.empty_cache()
+        gc.collect()
 
     print(f"Test Acc: {np.mean(test_accs)} +- {np.std(test_accs)}")
 
