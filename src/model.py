@@ -269,8 +269,6 @@ class GNN(torch.nn.Module):
         self.normalize = normalize
 
 
-    
-
     def forward(self, x, edge_index):
         if self.conv_type == "complex-fabernet":
             x_real =  x
