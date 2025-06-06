@@ -21,10 +21,8 @@ def get_conv(conv_type, input_dim, output_dim, alpha, K_plus = 3, K_minus = 1, z
         raise ValueError(f"Convolution type {conv_type} not supported")
 
 
-
-
 class FaberConv(torch.nn.Module):
-    def __init__(self, input_dim, output_dim, alpha, K_plus=1, exponent = -0.25, weight_penalty = 'exp', zero_order = False):
+    def __init__(self, input_dim, output_dim, alpha, K_plus=1, exponent=-0.25, weight_penalty='exp', zero_order=False):
         super(FaberConv, self).__init__()
 
         self.input_dim = input_dim
@@ -40,8 +38,6 @@ class FaberConv(torch.nn.Module):
             self.lin_src_to_dst_zero = Linear(input_dim, output_dim)
             #Source to destination 
             self.lin_dst_to_src_zero = Linear(input_dim, output_dim)
-
-
 
         #Lins for positive powers:
         self.lins_src_to_dst = torch.nn.ModuleList([
@@ -60,8 +56,6 @@ class FaberConv(torch.nn.Module):
             row, col = edge_index
             num_nodes = x.shape[0]
 
-            
-
             adj = SparseTensor(row=row, col=col, sparse_sizes=(num_nodes, num_nodes))
             self.adj_norm = get_norm_adj(adj, norm="dir", exponent = self.exponent)
 
@@ -73,11 +67,8 @@ class FaberConv(torch.nn.Module):
         sum_src_to_dst = self.lins_src_to_dst[0](y) 
         sum_dst_to_src = self.lins_dst_to_src[0](y_t) 
         if self.zero_order:
-            sum_src_to_dst =  sum_src_to_dst + self.lin_src_to_dst_zero(x)
-            sum_dst_to_src =  sum_dst_to_src + self.lin_dst_to_src_zero(x)
-
-
-
+            sum_src_to_dst = sum_src_to_dst + self.lin_src_to_dst_zero(x)
+            sum_dst_to_src = sum_dst_to_src + self.lin_dst_to_src_zero(x)
 
         if self.K_plus > 1:
             if self.weight_penalty == 'exp':
@@ -99,7 +90,6 @@ class FaberConv(torch.nn.Module):
                 raise ValueError(f"Weight penalty type {self.weight_penalty} not supported")
        
         total = self.alpha * sum_src_to_dst + (1 - self.alpha) * sum_dst_to_src
-
 
         return total
 
@@ -124,8 +114,6 @@ class ComplexFaberConv(torch.nn.Module):
             #Destination to source
             self.lin_real_dst_to_src_zero = Linear(input_dim, output_dim)
             self.lin_imag_dst_to_src_zero = Linear(input_dim, output_dim)
-
-
 
         #Lins for positive powers:
         #Source to destination 
@@ -176,32 +164,27 @@ class ComplexFaberConv(torch.nn.Module):
             sum_real_dst_to_src = sum_real_dst_to_src + self.lin_real_dst_to_src_zero(x_real) - self.lin_imag_dst_to_src_zero(x_imag)
             sum_imag_dst_to_src = sum_imag_dst_to_src + self.lin_imag_dst_to_src_zero(x_real) + self.lin_real_dst_to_src_zero(x_imag)
 
-
-
-
-        
         if self.K_plus > 1:
             if self.weight_penalty == 'exp':
                 for i in range(1,self.K_plus):
-                    y_real = self.adj_norm   @ x_real
-                    y_imag = self.adj_norm   @ x_imag
-
-                    y_real_t = self.adj_t_norm @ x_real
-                    y_imag_t = self.adj_t_norm @ x_imag
+                    # y_real = self.adj_norm   @ x_real  # Qin comment out these because of redundancy
+                    # y_imag = self.adj_norm   @ x_imag
+                    #
+                    # y_real_t = self.adj_t_norm @ x_real
+                    # y_imag_t = self.adj_t_norm @ x_imag
 
                     sum_real_src_to_dst = sum_real_src_to_dst + (self.lins_real_src_to_dst[i](y_real) - self.lins_imag_src_to_dst[i](y_imag))/(2**i)
                     sum_imag_src_to_dst = sum_imag_src_to_dst + (self.lins_imag_src_to_dst[i](y_real) + self.lins_real_src_to_dst[i](y_imag))/(2**i)
-
 
                     sum_real_dst_to_src = sum_real_dst_to_src + (self.lins_real_src_to_dst[i](y_real_t) - self.lins_imag_src_to_dst[i](y_imag_t))/(2**i)
                     sum_imag_dst_to_src = sum_imag_dst_to_src + (self.lins_imag_src_to_dst[i](y_real) + self.lins_real_src_to_dst[i](y_imag_t))/(2**i)
             elif self.weight_penalty == 'lin':
                 for i in range(1,self.K_plus):
-                    y_real = self.adj_norm   @ x_real
-                    y_imag = self.adj_norm   @ x_imag
-
-                    y_real_t = self.adj_t_norm @ x_real
-                    y_imag_t = self.adj_t_norm @ x_imag
+                    # y_real = self.adj_norm   @ x_real    # Qin comment out these because of redundancy
+                    # y_imag = self.adj_norm   @ x_imag
+                    #
+                    # y_real_t = self.adj_t_norm @ x_real
+                    # y_imag_t = self.adj_t_norm @ x_imag
 
                     sum_real_src_to_dst = sum_real_src_to_dst + (self.lins_real_src_to_dst[i](y_real) - self.lins_imag_src_to_dst[i](y_imag))/i
                     sum_imag_src_to_dst = sum_imag_src_to_dst + (self.lins_imag_src_to_dst[i](y_real) + self.lins_real_src_to_dst[i](y_imag))/i
@@ -271,7 +254,7 @@ class GNN(torch.nn.Module):
 
     def forward(self, x, edge_index):
         if self.conv_type == "complex-fabernet":
-            x_real =  x
+            x_real = x
 
             x_imag = torch.zeros_like(x)
 

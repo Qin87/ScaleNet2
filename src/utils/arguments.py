@@ -39,7 +39,7 @@ parser.add_argument("--patience", type=int, help="Patience for early stopping", 
 parser.add_argument("--num_runs", type=int, help="Max number of runs", default=1)
 
 ### System Args
-parser.add_argument("--use_best_hyperparams", action="store_true")
+parser.add_argument("--use_best_hyperparams", action="store_false")
 parser.add_argument("--gpu_idx", type=int, help="Indexes of gpu to run program on", default=0)
 parser.add_argument("--num_workers", type=int, help="Num of workers for the dataloader", default=0)
 parser.add_argument("--log", type=str, help="Log Level", default="INFO", choices=["DEBUG", "INFO", "WARNING"])
