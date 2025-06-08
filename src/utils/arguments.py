@@ -2,6 +2,7 @@ import argparse
 import logging
 
 parser = argparse.ArgumentParser("Directed Graph Neural Network")
+parser.add_argument("--seed", type=int, help="manual seed", default=100)
 
 ### Dataset Args
 parser.add_argument("--dataset", type=str, help="Name of dataset", default="chameleon")
@@ -17,6 +18,7 @@ parser.add_argument("--transpose", action="store_true", help="Whether to use tra
 parser.add_argument("--model", type=str, help="Model type", default="gnn")
 parser.add_argument("--hidden_dim", type=int, help="Hidden dimension of model", default=64)
 parser.add_argument("--num_layers", type=int, help="Number of GNN layers", default=3)
+
 parser.add_argument("--dropout", type=float, help="Feature dropout", default=0.0)
 parser.add_argument("--alpha", type=float, help="Direction convex combination params", default=0.5)
 parser.add_argument("--learn_alpha", action="store_true")

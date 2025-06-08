@@ -28,7 +28,7 @@ torch.load = custom_load
 
 
 def run(args):
-    torch.manual_seed(0)
+    torch.manual_seed(args.seed)
 
     # Get dataset and dataloader
     dataset, evaluator = get_dataset(
