@@ -16,7 +16,6 @@ squirrel:
 
 # 80.33 ± 1.19
 chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.012484612170673247  0.7953947424888611 +- 0.0124846121706
-#  Qin run not comment out redundancy: 0.8004386007785798 +- 0.011095704102747576
   lr: 0.005
   hidden_dim: 128
   num_layers: 5
