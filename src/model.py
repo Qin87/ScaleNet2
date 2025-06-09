@@ -148,7 +148,6 @@ class ComplexFaberConv(torch.nn.Module):
 
         y_real = self.adj_norm   @ x_real
         y_imag = self.adj_norm   @ x_imag
-
         y_real_t = self.adj_t_norm @ x_real
         y_imag_t = self.adj_t_norm @ x_imag
         
@@ -159,35 +158,16 @@ class ComplexFaberConv(torch.nn.Module):
         if self.zero_order:
             sum_real_src_to_dst = sum_real_src_to_dst + self.lin_real_src_to_dst_zero(x_real) - self.lin_imag_src_to_dst_zero(x_imag)
             sum_imag_src_to_dst = sum_imag_src_to_dst + self.lin_imag_src_to_dst_zero(x_real) + self.lin_real_src_to_dst_zero(x_imag)
-
             sum_real_dst_to_src = sum_real_dst_to_src + self.lin_real_dst_to_src_zero(x_real) - self.lin_imag_dst_to_src_zero(x_imag)
             sum_imag_dst_to_src = sum_imag_dst_to_src + self.lin_imag_dst_to_src_zero(x_real) + self.lin_real_dst_to_src_zero(x_imag)
 
         if self.K_plus > 1:
             if self.weight_penalty == 'exp':
                 for i in range(1,self.K_plus):
-                    # y_real_before = y_real.clone()   # Qin debug
-                    # y_imag_before = y_imag.clone()
-                    # y_real_t_before = y_real_t.clone()
-                    # y_imag_t_before = y_imag_t.clone()
-                    #
-                    # y_real = self.adj_norm   @ x_real  # Qin comment out these because of redundancy
-                    # y_imag = self.adj_norm   @ x_imag
-                    #
-                    # y_real_t = self.adj_t_norm @ x_real
-                    # y_imag_t = self.adj_t_norm @ x_imag
-                    #
-                    # def check_change(name, before, after):
-                    #     if not torch.allclose(before, after):
-                    #         print(f"{name} changed at iteration {i}")
-                    #     else:
-                    #         # print(f"{name} unchanged at iteration {i}")
-                    #         print(f"--unchanged")
-                    #
-                    # check_change("y_real", y_real_before, y_real)
-                    # check_change("y_imag", y_imag_before, y_imag)
-                    # check_change("y_real_t", y_real_t_before, y_real_t)
-                    # check_change("y_imag_t", y_imag_t_before, y_imag_t)
+                    y_real = self.adj_norm   @ x_real  # Qin comment out these because of redundancy
+                    y_imag = self.adj_norm   @ x_imag
+                    y_real_t = self.adj_t_norm @ x_real
+                    y_imag_t = self.adj_t_norm @ x_imag
 
                     sum_real_src_to_dst = sum_real_src_to_dst + (self.lins_real_src_to_dst[i](y_real) - self.lins_imag_src_to_dst[i](y_imag))/(2**i)
                     sum_imag_src_to_dst = sum_imag_src_to_dst + (self.lins_imag_src_to_dst[i](y_real) + self.lins_real_src_to_dst[i](y_imag))/(2**i)

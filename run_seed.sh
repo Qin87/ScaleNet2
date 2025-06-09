@@ -7,7 +7,7 @@ seeds=(100 200 300 400 500 600 700 800 900 1000)
 for seed in "${seeds[@]}"
 do
     echo "Running with seed $seed..."
-    python3 -u -m src.run --seed="$seed" > "comentOut_chame${seed}.log" 2>&1
+    python3 -u -m src.run --seed="$seed" > "keep_chame${seed}.log" 2>&1
     echo "Finished seed $seed."
 done
 
