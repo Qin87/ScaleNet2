@@ -1,7 +1,8 @@
 import os
 import numpy as np
-import uuid
+import socket, uuid
 import gc
+
 
 import torch
 from torch.utils.data import DataLoader
@@ -113,4 +114,6 @@ if __name__ == "__main__":
     print(args)
     args = use_best_hyperparams(args, args.dataset) if args.use_best_hyperparams else args
     print('best:', args)
+    print(f"Machine ID: {socket.gethostname()}-{':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 8 * 6, 8)][::-1])}")
+
     run(args)

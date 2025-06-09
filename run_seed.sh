@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Define seeds to run
-seeds=(100 200 300 400 500 600 700 800 900 1000)
+# Define seeds to run 100 200 300 400 500 600
+seeds=( 700 800 900 1000)
 
 # Run sequentially
 for seed in "${seeds[@]}"
