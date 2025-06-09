@@ -6,7 +6,7 @@ layers=(1 2 3 4 5 6 7 8)
 for layer in "${layers[@]}"
 do
     echo "Running with layer $layer..."
-    python3 -u -m src.run --num_layers="$layer"  --dataset='squirrel'  > "faber_chame${layer}.log" 2>&1
+    python3 -u -m src.run  --num_layers="$layer"   > "faber_chame${layer}.log" 2>&1
     echo "Finished seed $layer."
 done
 
