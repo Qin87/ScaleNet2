@@ -110,5 +110,7 @@ def run(args):
 
 
 if __name__ == "__main__":
+    print(args)
     args = use_best_hyperparams(args, args.dataset) if args.use_best_hyperparams else args
+    print('best:', args)
     run(args)

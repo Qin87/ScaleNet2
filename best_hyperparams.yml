@@ -2,10 +2,10 @@
 squirrel:
   lr: 0.01
   hidden_dim: 128
-  num_layers: 4
+#  num_layers: 4
   jk: "max"
   patience: 400
-  conv_type: "complex-fabernet"
+#  conv_type: "complex-fabernet"
   alpha: 0
   normalize: True
   imag_weight_decay: 0.1
@@ -18,10 +18,10 @@ squirrel:
 chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.012484612170673247  0.7953947424888611 +- 0.0124846121706
   lr: 0.005
   hidden_dim: 128
-  num_layers: 5
+#  num_layers: 5
   jk: "cat"
   patience: 400
-  conv_type: "complex-fabernet"
+#  conv_type: "complex-fabernet"
   alpha: 0
   normalize: True
   imag_weight_decay: 1
