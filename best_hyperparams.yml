@@ -10,7 +10,7 @@ squirrel:
   normalize: True
   imag_weight_decay: 0.1
   real_weight_decay: 0.1
-  k_plus: 5
+#  k_plus: 5
   exponent: -0.25
   weight_penalty: exp
 
