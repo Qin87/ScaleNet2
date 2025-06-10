@@ -16,8 +16,6 @@ from src.model import get_model, LightingFullBatchModelWrapper
 from src.utils.arguments import args
 from src.utils.utils import use_best_hyperparams, get_available_accelerator
 
-# import torch
-
 original_load = torch.load
 
 def custom_load(*args, **kwargs):
@@ -110,9 +108,8 @@ def run(args):
 
 
 if __name__ == "__main__":
-    print(args)
     args = use_best_hyperparams(args, args.dataset) if args.use_best_hyperparams else args
-    print('best:', args)
+    print(args)
     print(f"Machine ID: {socket.gethostname()}-{':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 8 * 6, 8)][::-1])}")
 
     run(args)

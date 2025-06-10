@@ -26,7 +26,7 @@ chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.0124846
   normalize: True
   imag_weight_decay: 1
   real_weight_decay: 1
-  k_plus: 4
+#  k_plus: 4
   exponent: -0.25
   weight_penalty: exp
 

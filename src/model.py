@@ -200,6 +200,9 @@ class ComplexFaberConv(torch.nn.Module):
 
 
 class QinFaberConv(torch.nn.Module):
+    '''
+    TODO, Qin want to try replace ComplexFaberConv with AXW+AXW*1/2+ AXW*1/2^2+...+AXW*1/2^k test it whether improves
+    '''
     def __init__(self, input_dim, output_dim, alpha, K_plus=3, exponent=-0.25, weight_penalty='exp', zero_order=False):
         super(ComplexFaberConv, self).__init__()
 
