@@ -86,6 +86,14 @@ class FaberConv(torch.nn.Module):
 
                     sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](y)/i
                     sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](y_t)/i
+            elif self.weight_penalty == '0':        # Qin, no penalty
+                for i in range(1,self.K_plus):
+                    y   = self.adj_norm   @ y
+                    y_t = self.adj_t_norm @ y
+
+                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](y)
+                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](y_t)
+
             else:
                 raise ValueError(f"Weight penalty type {self.weight_penalty} not supported")
        
@@ -201,7 +209,7 @@ class ComplexFaberConv(torch.nn.Module):
 
 class QinFaberConv(torch.nn.Module):
     '''
-    TODO, Qin want to try replace ComplexFaberConv with AXW+AXW*1/2+ AXW*1/2^2+...+AXW*1/2^k test it whether improves
+    Qin want to try replace ComplexFaberConv with AXW+AXW*1/2+ AXW*1/2^2+...+AXW*1/2^k test it whether improves
     '''
     def __init__(self, input_dim, output_dim, alpha, K_plus=3, exponent=-0.25, weight_penalty='exp', zero_order=False):
         super(ComplexFaberConv, self).__init__()
