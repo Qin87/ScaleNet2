@@ -13,6 +13,7 @@ squirrel:
   k_plus: 5
   exponent: -0.25
 #  weight_penalty: exp
+  num_runs: 10  # original split
 
 # 80.33 ± 1.19
 chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.012484612170673247  0.7953947424888611 +- 0.0124846121706
@@ -29,6 +30,7 @@ chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.0124846
   k_plus: 4
   exponent: -0.25
 #  weight_penalty: exp
+  num_runs: 10  # original split
 
 # 64.43 ± 0.28
 arxiv-year:
@@ -43,6 +45,7 @@ arxiv-year:
   exponent: -0.25
   lrelu_slope: 0
 #  weight_penalty: exp
+  num_runs: 5  # original split
 
 # 75.10 ± 0.03
 snap-patents:
@@ -59,6 +62,7 @@ snap-patents:
   exponent: -0.25
 #  weight_penalty: exp
   lrelu_slope:  0
+  num_runs: 5  # original split
 
 # 92.24 ± 0.432
 directed-roman-empire:
@@ -75,3 +79,4 @@ directed-roman-empire:
   lrelu_slope: 0
 #  weight_penalty: exp
   zero_order: True
+  num_runs: 10  # original split

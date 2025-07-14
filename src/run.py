@@ -40,6 +40,8 @@ def run(args):
     data_loader = DataLoader(FullBatchGraphDataset(data), batch_size=1, collate_fn=lambda batch: batch[0])
 
     val_accs, test_accs = [], []
+
+    # args.num_runs = args.num_runs if args.num_runs < data.train_mask.shape[1] else data.train_mask.shape[1]
     for num_run in range(args.num_runs):
         # Get train/val/test splits for the current run
         train_mask, val_mask, test_mask = get_dataset_split(args.dataset, data, args.dataset_directory, num_run)
