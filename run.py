@@ -11,8 +11,6 @@ from pytorch_lightning.callbacks import ModelSummary, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
 
-# sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))   # so run.py can be run directly
 from datasets.dataset import FullBatchGraphDataset
 from datasets.data_loading import get_dataset, get_dataset_split
 from model import get_model, LightingFullBatchModelWrapper
@@ -44,7 +42,6 @@ def run(args):
 
     val_accs, test_accs = [], []
 
-    # args.num_runs = args.num_runs if args.num_runs < data.train_mask.shape[1] else data.train_mask.shape[1]
     for num_run in range(args.num_runs):
         # Get train/val/test splits for the current run
         train_mask, val_mask, test_mask = get_dataset_split(args.dataset, data, args.dataset_directory, num_run)
