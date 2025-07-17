@@ -10,7 +10,7 @@ import time
 import numpy as np
 import pytorch_lightning as pl
 import torch
-torch.set_float32_matmul_precision('medium')
+# torch.set_float32_matmul_precision('medium')  # higher precision is slower
 from pytorch_lightning.callbacks import ModelSummary, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
@@ -36,28 +36,26 @@ torch.load = custom_load
 
 
 def run(args):
+    torch.manual_seed(args.seed)
+    # Get dataset and dataloader
+    dataset, evaluator = get_dataset(
+        name=args.dataset,
+        root_dir=args.dataset_directory,
+        undirected=args.undirected,
+        self_loops=args.self_loops,
+        transpose=args.transpose,
+    )
+    data = dataset._data
+    data_loader = DataLoader(FullBatchGraphDataset(data), batch_size=1, collate_fn=lambda batch: batch[0])
+
     start_time = time.time()
     with open(log_directory + log_file_name_with_timestamp, 'w') as log_file:
         print(args, file=log_file)
         print(f"Machine ID: {socket.gethostname()}-{':'.join(['{:02x}'.format((uuid.getnode() >> elements) & 0xff) for elements in range(0, 8 * 6, 8)][::-1])}", file=log_file)
 
-
         sys.stdout = log_file
-        torch.manual_seed(args.seed)
-
-        # Get dataset and dataloader
-        dataset, evaluator = get_dataset(
-            name=args.dataset,
-            root_dir=args.dataset_directory,
-            undirected=args.undirected,
-            self_loops=args.self_loops,
-            transpose=args.transpose,
-        )
-        data = dataset._data
-        data_loader = DataLoader(FullBatchGraphDataset(data), batch_size=1, collate_fn=lambda batch: batch[0])
 
         val_accs, test_accs = [], []
-
         for num_run in range(args.num_runs):
             # Get train/val/test splits for the current run
             train_mask, val_mask, test_mask = get_dataset_split(args.dataset, data, args.dataset_directory, num_run)

@@ -2,14 +2,12 @@
 squirrel:
   lr: 0.01
   hidden_dim: 128
-  num_layers: 4
+  layer: 4
   jk: "max"
   patience: 400
 #  conv_type: "complex-fabernet"
   alpha: 1
   normalize: True
-  imag_weight_decay: 0.1
-  real_weight_decay: 0.1
   k_plus: 5
   exponent: -0.25
 #  weight_penalty: exp
@@ -19,14 +17,12 @@ squirrel:
 chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.012484612170673247  0.7953947424888611 +- 0.0124846121706
   lr: 0.005
   hidden_dim: 128
-  num_layers: 5
+  layer: 5
   jk: "cat"
   patience: 400
 #  conv_type: "complex-fabernet"
   alpha: 1
   normalize: True
-  imag_weight_decay: 1
-  real_weight_decay: 1
   k_plus: 4
   exponent: -0.25
 #  weight_penalty: exp
@@ -36,7 +32,7 @@ chameleon:   # Qin run comment out redundancy :  0.7953947424888611 +- 0.0124846
 arxiv-year:
   lr: 0.005
   hidden_dim: 256
-  num_layers: 6
+  layer: 6
   jk: "cat"
   patience: 200
   conv_type: "fabernet"
@@ -51,7 +47,7 @@ arxiv-year:
 snap-patents:
   lr: 0.01
   hidden_dim: 32
-  num_layers: 5
+  layer: 5
   jk: "max"
   patience: 400
   normalize: True
@@ -68,7 +64,7 @@ snap-patents:
 directed-roman-empire:
   lr: 0.01
   hidden_dim: 256
-  num_layers: 5
+  layer: 5
   jk: "cat"
   dropout: 0.2
   patience: 200

@@ -5,7 +5,7 @@ Direct_dataset=(     'chameleon'  'squirrel'  'arxiv-year'  'snap-patents' 'dire
 # Run sequentially
 for Didataset in "${Direct_dataset[@]}"; do
     echo "Running with $Didataset..."
-    python3 -u -m src.run    --dataset="$Didataset"     > "all_${Didataset}.log" 2>&1
+    python3  run.py   --dataset="$Didataset"     > "July17_${Didataset}.log" 2>&1
     echo "Finished seed $layer."
 done
 
