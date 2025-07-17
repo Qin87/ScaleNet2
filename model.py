@@ -312,7 +312,7 @@ class GNN(torch.nn.Module):
         num_features,
         num_classes,
         hidden_dim,
-        num_layers=2,
+        layer=2,
         dropout=0,
         conv_type="fabernet",
         jumping_knowledge=False,
@@ -332,23 +332,23 @@ class GNN(torch.nn.Module):
         
 
         output_dim = hidden_dim if jumping_knowledge else num_classes
-        if num_layers == 1:
+        if layer == 1:
             self.convs = ModuleList([get_conv(conv_type, num_features, output_dim, alpha = self.alpha, K_plus = K_plus, zero_order = zero_order,exponent =  exponent,weight_penalty = weight_penalty)])
         else:
             self.convs = ModuleList([get_conv(conv_type, num_features, hidden_dim, alpha = self.alpha, K_plus = K_plus, zero_order = zero_order,exponent =  exponent,weight_penalty = weight_penalty)])
-            for _ in range(num_layers - 2):
+            for _ in range(layer - 2):
                 self.convs.append(get_conv(conv_type, hidden_dim, hidden_dim, alpha = self.alpha, K_plus = K_plus, zero_order = zero_order,exponent =  exponent,weight_penalty = weight_penalty))
             self.convs.append(get_conv(conv_type, hidden_dim, output_dim,  alpha = self.alpha, K_plus = K_plus,  zero_order = zero_order,exponent =  exponent,weight_penalty = weight_penalty))
 
         if jumping_knowledge is not None:
             if self.conv_type == "complex-fabernet":
-                input_dim = 2*hidden_dim * num_layers if jumping_knowledge == "cat" else 2*hidden_dim
+                input_dim = 2*hidden_dim * layer if jumping_knowledge == "cat" else 2*hidden_dim
             else:
-                input_dim = hidden_dim * num_layers if jumping_knowledge == "cat" else hidden_dim
+                input_dim = hidden_dim * layer if jumping_knowledge == "cat" else hidden_dim
             self.lin = Linear(input_dim, num_classes)
-            self.jump = JumpingKnowledge(mode=jumping_knowledge, channels=hidden_dim, num_layers=num_layers)
+            self.jump = JumpingKnowledge(mode=jumping_knowledge, channels=hidden_dim, num_layers=layer)
 
-        self.num_layers = num_layers
+        self.layer = layer
         self.dropout = dropout
         self.jumping_knowledge = jumping_knowledge
         self.normalize = normalize
@@ -400,12 +400,12 @@ class GNN(torch.nn.Module):
 
 
 class LightingFullBatchModelWrapper(pl.LightningModule):
-    def __init__(self, model, lr, weight_decay, real_weight_decay, imag_weight_decay, train_mask, val_mask, test_mask, evaluator=None):
+    def __init__(self, model, lr, weight_decay, train_mask, val_mask, test_mask, evaluator=None):
         super().__init__()
         self.model = model
         self.lr = lr
-        self.imag_weight_decay = imag_weight_decay
-        self.real_weight_decay = real_weight_decay
+        # self.imag_weight_decay = imag_weight_decay
+        # self.real_weight_decay = real_weight_decay
         self.weight_decay = weight_decay
         self.evaluator = evaluator
         self.train_mask, self.val_mask, self.test_mask = train_mask, val_mask, test_mask
@@ -457,7 +457,11 @@ class LightingFullBatchModelWrapper(pl.LightningModule):
             else:
                 other_params.append(param)
 
-        optimizer = optim.AdamW([{'params': other_params, 'weight_decay': self.weight_decay}, {'params': real_weights, 'weight_decay': self.real_weight_decay}, {'params': imag_weights, 'weight_decay': self.imag_weight_decay}], lr = self.lr)
+        optimizer = optim.AdamW([
+            {'params': other_params, 'weight_decay': self.weight_decay},
+            # {'params': real_weights, 'weight_decay': self.real_weight_decay},   # Qin comment out
+            # {'params': imag_weights, 'weight_decay': self.imag_weight_decay}
+        ], lr = self.lr)
         
         return optimizer
 
@@ -466,7 +470,7 @@ def get_model(args):
     return GNN(
         num_features=args.num_features,
         hidden_dim=args.hidden_dim,
-        num_layers=args.num_layers,
+        layer=args.layer,
         num_classes=args.num_classes,
         dropout=args.dropout,
         conv_type=args.conv_type,
