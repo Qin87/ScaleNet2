@@ -1,7 +1,7 @@
 import gc
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0' # supress: oneDNN custom operations are on
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # supress warning:Unable to register cuFFT factory...
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 3 supress warning:Unable to register cuFFT factory...
 import sys
 import socket
 import uuid
