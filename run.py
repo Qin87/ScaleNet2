@@ -57,6 +57,7 @@ def run(args):
 
         val_accs, test_accs = [], []
         for num_run in range(args.num_runs):
+            print("start run: ", num_run)
             # Get train/val/test splits for the current run
             train_mask, val_mask, test_mask = get_dataset_split(args.dataset, data, args.dataset_directory, num_run)
 
@@ -68,7 +69,7 @@ def run(args):
                 model=model,
                 lr=args.lr,
                 weight_decay=args.weight_decay,
-                # imag_weight_decay=args.imag_weight_decay,   # Qin comment out
+                # imag_weight_decay=args.imag_weight_decay,   # Me comment out
                 # real_weight_decay=args.real_weight_decay,
                 evaluator=evaluator,
                 train_mask=train_mask,
@@ -120,6 +121,9 @@ def run(args):
             del model_checkpoint_callback
             torch.cuda.empty_cache()
             gc.collect()
+
+            print('Used time: ', time.time() - start_time, file=log_file)
+            print("finish run: ", num_run)
 
 
         print(f"Test Acc: {np.mean(test_accs)*100:.2f}±{np.std(test_accs)*100:.2f}", file=log_file)

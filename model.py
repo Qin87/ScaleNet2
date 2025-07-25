@@ -16,6 +16,8 @@ def get_conv(conv_type, input_dim, output_dim, alpha, K_plus = 3, K_minus = 1, z
         return GCNConv(input_dim, output_dim, add_self_loops=False)
     elif conv_type == "fabernet":
         return FaberConv(input_dim, output_dim, alpha=alpha, K_plus = K_plus, exponent = exponent, weight_penalty = weight_penalty, zero_order = zero_order)
+    elif conv_type == "scalenet":
+        return ScaleConv(input_dim, output_dim, alpha=alpha, K_plus = K_plus, exponent = exponent, weight_penalty = weight_penalty, zero_order = zero_order)
     elif conv_type == "complex-fabernet":
         return ComplexFaberConv(input_dim, output_dim, alpha=alpha, K_plus = K_plus, exponent = exponent, weight_penalty = weight_penalty, zero_order = zero_order)
     else:
@@ -77,29 +79,23 @@ class ScaleConv(torch.nn.Module):
             yty = y
             yyt = y_t
 
+            yy = self.adj_norm @ yy
+            yty = self.adj_t_norm @ yty
+
+            yyt = self.adj_norm @ yyt
+            ytyt = self.adj_t_norm @ ytyt
+
             if self.weight_penalty == 'exp':
                 for i in range(1, self.K_plus):
-                    y = self.adj_norm @ y
-                    y_t = self.adj_t_norm @ y
-
-                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](y) / (2 ** i)
-                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](y_t) / (2 ** i)
+                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](yy) / (2 ** i)+ self.lins_src_to_dst[i](yyt) /(2 ** i)
+                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](ytyt) / (2 ** i)+self.lins_src_to_dst[i](yty) /(2 ** i)
 
             elif self.weight_penalty == 'lin':
                 for i in range(1, self.K_plus):
-                    y = self.adj_norm @ y
-                    y_t = self.adj_t_norm @ y
-
-                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](y) / i
-                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](y_t) / i
-            elif self.weight_penalty == '0':  # no penalty
+                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](yy) / i  + self.lins_src_to_dst[i](yyt) /i
+                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](ytyt) / i + self.lins_src_to_dst[i](yty) /i
+            elif self.weight_penalty is None:  # no penalty
                 for i in range(1, self.K_plus):
-                    yy = self.adj_norm @ yy
-                    yty = self.adj_t_norm @ yty
-
-                    yyt = self.adj_norm @ yyt
-                    ytyt = self.adj_t_norm @ ytyt
-
                     sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](yy) + self.lins_src_to_dst[i](yyt)
                     sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](ytyt) + self.lins_src_to_dst[i](yty)
 
@@ -113,7 +109,7 @@ class ScaleConv(torch.nn.Module):
 
 class FaberConv(torch.nn.Module):
     def __init__(self, input_dim, output_dim, alpha, K_plus=1, exponent=-0.25, weight_penalty='exp', zero_order=False):
-        super(FaberConv, self).__init__()
+        super().__init__()
 
         self.input_dim = input_dim
         self.output_dim = output_dim

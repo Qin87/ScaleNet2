@@ -2,7 +2,7 @@ import argparse
 import logging
 
 parser = argparse.ArgumentParser("Directed Graph Neural Network")
-parser.add_argument("--seed", type=int, help="manual seed", default=100)
+parser.add_argument("--seed", type=int, help="manual seed", default=10)
 
 ### Dataset Args
 parser.add_argument("--dataset", type=str, help="Name of dataset", default="chameleon")
@@ -24,11 +24,11 @@ parser.add_argument("--alpha", type=float, help="Direction convex combination pa
 parser.add_argument("--beta", type=float, help="Direction convex combination params", default=1)
 parser.add_argument("--gama", type=float, help="Direction convex combination params", default=1)
 parser.add_argument("--learn_alpha", action="store_true")
-parser.add_argument("--conv_type", type=str, help="Selects Convolutional Layer", default="fabernet")
+parser.add_argument("--conv_type", type=str, help="Selects Convolutional Layer", default="scalenet")
 parser.add_argument("--normalize", action="store_true")
 parser.add_argument("--jk", type=str, choices=["max", "cat", None], default="max")
-parser.add_argument("--weight_penalty", type=str, choices=["exp", "lin", None], default="exp")
-parser.add_argument("--k_plus", type=int, help="Polynomial order", default=3)
+parser.add_argument("--weight_penalty", type=str, choices=["exp", "lin", None], default=None)
+parser.add_argument("--k_plus", type=int, help="Polynomial order", default=2)
 parser.add_argument("--exponent", type=float, help="exponent in norm", default= -0.25)
 parser.add_argument("--lrelu_slope", type=float, help="negative slope of Leaky Relu", default= -1.0)
 parser.add_argument("--zero_order", type=bool, help="If zero order", default= False)
