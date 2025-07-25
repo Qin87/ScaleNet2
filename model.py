@@ -22,6 +22,95 @@ def get_conv(conv_type, input_dim, output_dim, alpha, K_plus = 3, K_minus = 1, z
         raise ValueError(f"Convolution type {conv_type} not supported")
 
 
+class ScaleConv(torch.nn.Module):
+    '''
+    multi-scale  TODO
+    '''
+    def __init__(self, input_dim, output_dim, alpha, K_plus=1, exponent=-0.25, weight_penalty='exp', zero_order=False):
+        super().__init__()
+
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.K_plus = K_plus
+        self.exponent = exponent
+        self.weight_penalty = weight_penalty
+        self.zero_order = zero_order
+
+        if self.zero_order:
+            self.lin_src_to_dst_zero = Linear(input_dim, output_dim)
+            self.lin_dst_to_src_zero = Linear(input_dim, output_dim)
+
+        # Lins for positive powers:
+        self.lins_src_to_dst = torch.nn.ModuleList([
+            Linear(input_dim, output_dim) for _ in range(K_plus)
+        ])
+
+        self.lins_dst_to_src = torch.nn.ModuleList([
+            Linear(input_dim, output_dim) for _ in range(K_plus)
+        ])
+
+        self.alpha = alpha
+        self.adj_norm, self.adj_t_norm = None, None
+
+    def forward(self, x, edge_index):
+        if self.adj_norm is None:
+            row, col = edge_index
+            num_nodes = x.shape[0]
+
+            adj = SparseTensor(row=row, col=col, sparse_sizes=(num_nodes, num_nodes))
+            self.adj_norm = get_norm_adj(adj, norm="dir", exponent=self.exponent)
+
+            adj_t = SparseTensor(row=col, col=row, sparse_sizes=(num_nodes, num_nodes))
+            self.adj_t_norm = get_norm_adj(adj_t, norm="dir", exponent=self.exponent)
+
+        y = self.adj_norm @ x
+        y_t = self.adj_t_norm @ x
+        sum_src_to_dst = self.lins_src_to_dst[0](y)
+        sum_dst_to_src = self.lins_dst_to_src[0](y_t)
+        if self.zero_order:
+            sum_src_to_dst = sum_src_to_dst + self.lin_src_to_dst_zero(x)
+            sum_dst_to_src = sum_dst_to_src + self.lin_dst_to_src_zero(x)
+
+        if self.K_plus > 1:
+            yy = y
+            ytyt = y_t
+            yty = y
+            yyt = y_t
+
+            if self.weight_penalty == 'exp':
+                for i in range(1, self.K_plus):
+                    y = self.adj_norm @ y
+                    y_t = self.adj_t_norm @ y
+
+                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](y) / (2 ** i)
+                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](y_t) / (2 ** i)
+
+            elif self.weight_penalty == 'lin':
+                for i in range(1, self.K_plus):
+                    y = self.adj_norm @ y
+                    y_t = self.adj_t_norm @ y
+
+                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](y) / i
+                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](y_t) / i
+            elif self.weight_penalty == '0':  # no penalty
+                for i in range(1, self.K_plus):
+                    yy = self.adj_norm @ yy
+                    yty = self.adj_t_norm @ yty
+
+                    yyt = self.adj_norm @ yyt
+                    ytyt = self.adj_t_norm @ ytyt
+
+                    sum_src_to_dst = sum_src_to_dst + self.lins_src_to_dst[i](yy) + self.lins_src_to_dst[i](yyt)
+                    sum_dst_to_src = sum_dst_to_src + self.lins_dst_to_src[i](ytyt) + self.lins_src_to_dst[i](yty)
+
+            else:
+                raise ValueError(f"Weight penalty type {self.weight_penalty} not supported")
+
+        total = self.alpha * sum_src_to_dst + (1 - self.alpha) * sum_dst_to_src
+
+        return total
+
+
 class FaberConv(torch.nn.Module):
     def __init__(self, input_dim, output_dim, alpha, K_plus=1, exponent=-0.25, weight_penalty='exp', zero_order=False):
         super(FaberConv, self).__init__()

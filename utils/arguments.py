@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser("Directed Graph Neural Network")
 parser.add_argument("--seed", type=int, help="manual seed", default=100)
 
 ### Dataset Args
-parser.add_argument("--dataset", type=str, help="Name of dataset", default="arxiv-year")
+parser.add_argument("--dataset", type=str, help="Name of dataset", default="chameleon")
 parser.add_argument("--dataset_directory", type=str, help="Directory to save datasets", default="dataset")
 parser.add_argument("--checkpoint_directory", type=str, help="Directory to save checkpoints", default="checkpoint")
 
@@ -21,6 +21,8 @@ parser.add_argument("--layer", type=int, help="Number of GNN layers", default=3)
 
 parser.add_argument("--dropout", type=float, help="Feature dropout", default=0.0)
 parser.add_argument("--alpha", type=float, help="Direction convex combination params", default=0.5)
+parser.add_argument("--beta", type=float, help="Direction convex combination params", default=1)
+parser.add_argument("--gama", type=float, help="Direction convex combination params", default=1)
 parser.add_argument("--learn_alpha", action="store_true")
 parser.add_argument("--conv_type", type=str, help="Selects Convolutional Layer", default="fabernet")
 parser.add_argument("--normalize", action="store_true")
