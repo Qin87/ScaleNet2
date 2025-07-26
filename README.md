@@ -1,4 +1,6 @@
 # ScaleNet2: 
+Even remove writing log still much slower than in HoloNet.
+
 
 ScaleNet's revised version for large graphs.
 
